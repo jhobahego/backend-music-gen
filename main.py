@@ -1,9 +1,21 @@
 import os
 import random
+import multiprocessing
+from concurrent.futures import ThreadPoolExecutor
 
 from api import get_videos_from_youtube
 from converter import convert_to_mp3, download_video
 from globals import NUM_OF_VIDEOS_TO_DOWNLOAD
+
+
+def process_video(video):
+    try:
+        mp4_file = download_video(video)
+        if mp4_file:
+            return convert_to_mp3(mp4_file)
+    except Exception as e:
+        print(f"Error processing video {video.title}: {e}")
+    return None
 
 
 def main():
@@ -22,18 +34,12 @@ def main():
         print("No se encontraron videos en YouTube :(")
         return
 
-    mp3_files = []
-    for video in videos:
-        # Descarga el video usando yt-dlp con subprocess
-        downloaded_video = download_video(video)
-        if downloaded_video is None:
-            continue
+    # Limita la cantidad de videos a descargar
+    videos = videos[:NUM_OF_VIDEOS_TO_DOWNLOAD]
 
-        mp3_file = convert_to_mp3(downloaded_video)
-        if mp3_file is None:
-            continue
-
-        mp3_files.append(mp3_file)
+    max_workers = min(multiprocessing.cpu_count(), len(videos))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        mp3_files = list(filter(None, executor.map(process_video, videos)))
 
     downloaded_audios = os.listdir("media")
     if len(downloaded_audios) < NUM_OF_VIDEOS_TO_DOWNLOAD:
