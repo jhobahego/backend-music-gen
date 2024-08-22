@@ -20,9 +20,6 @@ def convert_to_mp3(video_file) -> str | None:
         audio = AudioSegment.from_file(video_file)
         audio.export(mp3_file, format="mp3")
 
-    # Opcional: elimina el archivo de video después de la conversión
-    os.remove(video_file)
-
     if os.path.exists(mp3_file):
         if os.path.isfile(mp3_file) and mp3_file.endswith(".mp3"):
             print(f"Archivo mp3 creado: {os.path.basename(mp3_file)}")
@@ -39,7 +36,7 @@ def download_video(video: YoutubeResult) -> str | None:
         return
 
     ruta_actual: str = os.path.join(os.getcwd(), "media")
-    goal_file = os.path.join(ruta_actual, video.title) + ".mp3"
+    goal_file = os.path.join(ruta_actual, video.title) + ".mp4"
 
     if os.path.exists(goal_file):
         print(f"El video ya existe: {video.title}")
