@@ -9,7 +9,7 @@ from globals import NUM_OF_VIDEOS_TO_DOWNLOAD
 
 def convert_to_mp3(video_file) -> str | None:
     _, ext = os.path.splitext(video_file)
-    if ext != ".mp4" or ext != ".webm":
+    if ext != ".mp4":
         print("Formato de archivo no soportado")
         return None
 
@@ -46,7 +46,7 @@ def download_video(video: YoutubeResult) -> str | None:
         return None
 
     ydl_opts = {
-        "format": "bestvideo+bestaudio[ext=m4a]/best",
+        "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best",
         "outtmpl": f"{ruta_actual}/%(title)s.%(ext)s",
     }
 
